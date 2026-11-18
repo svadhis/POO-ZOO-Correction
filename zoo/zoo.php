@@ -1,0 +1,267 @@
+<?php
+
+include_once('./employee/employee.php');
+include_once('./enclosure/enclosure.php');
+
+/**
+ * Class zoo.php
+ *
+ * @author Jeremy Michel
+ */
+class Zoo{
+
+    protected ?int $id = null;
+    protected string $name;
+    protected ?Employee $employee;
+    protected int $maxEnclosure;
+    protected array $enclosures;
+
+    /**
+     * Zoo constructor.
+     */
+    public function __construct(string $name, Employee $employee, int $maxEnclosure)
+    {
+        $this->name = $name;
+        $this->employee = $employee;
+        $this->maxEnclosure = $maxEnclosure;
+        $this->enclosures = [];
+    }
+
+    // TOSTRING ex :
+    public function __toString(): string {
+        $string= 'Zoo name : ' . $this->getName() . ' <br> ';
+        $string.= 'Employee name : ' . $this->getEmployee()->getName() . ' <br> ';
+        $string.= 'Max enclosure : ' . $this->getMaxEnclosure() . ' <br> ';
+        $string.= 'Enclosures : <br>';
+        foreach($this->enclosures as $enclosure){
+            $string.= ' * '.$enclosure->getName().'<br>';
+        }
+        $string.='<br>';
+        return $string;
+
+    }
+
+
+    ////////////
+    // GETTER //
+    ////////////
+
+    /**
+     * @return int|null
+     */
+    public function getId(): ?int
+    {
+        return $this->id;
+    }
+
+    /**
+     * return zoo name
+     * @return string
+     */
+    public function getName(): string
+    {
+        return $this->name;
+    }
+
+    /**
+     * return the zoo employee
+     * @return Employee
+     */
+    public function getEmployee(): Employee
+    {
+        return $this->employee;
+    }
+
+    /**
+     * return zoo max enclosure
+     * @return int
+     */
+    public function getMaxEnclosure(): int
+    {
+        return $this->maxEnclosure;
+    }
+
+    /**
+     * return enclosure tab
+     * @return array
+     */
+    public function getEnclosures(): array
+    {
+        return $this->enclosures;
+    }
+
+    /**
+     * return enclosure by name
+     * @return Enclosure|null
+     */
+    public function getEnclosureByName(string $enclosureName): ?Enclosure
+    {
+        foreach($this->getEnclosures() as $enclosure){
+            if($enclosure->getName() == $enclosureName){
+                return $enclosure;
+            }
+        }
+        return null;
+    }
+
+    /**
+     * return enclosure by id
+     * @return Enclosure|null
+     */
+    public function getEnclosureById(int $enclosureId): ?Enclosure
+    {
+        foreach($this->getEnclosures() as $enclosure){
+            if($enclosure->getId() === $enclosureId){
+                return $enclosure;
+            }
+        }
+        return null;
+    }
+
+
+    ////////////
+    // SETTER //
+    ////////////
+
+    /**
+     * Set the value of id
+     * @return  self
+     */
+    public function setId(?int $newId): self
+    {
+        $this->id = $newId;
+
+        return $this;
+    }
+
+    /**
+     * Set the enclosures array
+     * @return  self
+     */
+    public function setEnclosures(array $enclosures): self
+    {
+        $this->enclosures = $enclosures;
+
+        return $this;
+    }
+
+    /**
+     * Set the value of name
+     * @return  self
+     */
+    public function setName($newName):self
+    {
+        $this->name = $newName;
+
+        return $this;
+    }
+
+    /**
+     * Set the employee of the zoo
+     * @return  self
+     */
+    public function setEmployee($newEmployee):self
+    {
+        $this->employee = $newEmployee;
+
+        return $this;
+    }
+
+    /**
+     * Set the value of max enclosure
+     * @return  self
+     */
+    public function setMaxEnclosure($newMaxEnclosure):self
+    {
+        $this->maxEnclosure = $newMaxEnclosure;
+
+        return $this;
+    }
+
+    /**
+     * Add an Enclosure to the zoo
+     * @return  self
+     */
+    public function addEnclosure(Enclosure $enclosure):void{
+        // if there is enough space to add an enclosure
+        if(count($this->getEnclosures())<$this->getMaxEnclosure()){
+            // si l'enclos n'existe pas déjà
+            if(!in_array($enclosure, $this->enclosures)){
+                $this -> enclosures[] = $enclosure;
+            }
+        } else {
+            echo 'no space in the zoo for another enclosure <br><br>';
+        }
+
+    }
+
+    /**
+     * Remove an Enclosure from the zoo
+     * @return  void
+     */
+    public function removeEnclosure(Enclosure $enclosure):void{
+        // if the enclosure exist
+        if(in_array($enclosure, $this->enclosures)){
+            // if there is no animal in the enclosure
+            if(count($enclosure->getAnimals())==0){
+                unset($this->enclosures[array_search($enclosure, $this->enclosures)]);
+            } else {
+                echo 'an enclosure must be empty to be removed from the zoo <br><br>';
+            }
+        }
+
+    }
+
+    /**
+     * Display all enclosure and there content
+     * @return  void
+     */
+    public function displayEnclosureCharacteristicsAndContent():void{
+        // if there is enclosures
+        if(count($this->enclosures)!=0){
+            foreach($this->enclosures as $enclosure){
+                echo $enclosure;
+                $enclosure->displayAnimalCharacteristics();
+            }
+        }
+
+    }
+
+    /**
+     * Display the number of animal in the zoo
+     * @return  void
+     */
+    public function countAnimals():void{
+        // TODO
+    }
+
+    /**
+     * Days pass, values ​​change randomly
+     * @return  void
+     */
+    public function main():void{
+        foreach($this->getEnclosures() as $enclosure){
+            if(rand(1, 10)>3 && rand(1, 10)<=6){
+                $enclosure->setCleanliness('moderately clean');
+            } else {
+                if(rand(1, 10)>6 && rand(1, 10)<=10){
+                    $enclosure->setCleanliness('dirty');
+                }
+            }
+            foreach($enclosure->getAnimals() as $animal){
+                if(rand(1, 10)>6){
+                    $animal->setIsSleeping(true);
+                } else {
+                    $animal->setIsSleeping(false);
+                }
+
+                if(rand(1,10)>5){
+                    $animal->setIsHungry(true);
+                }
+            }
+        }
+    }
+
+}
+
+?>
